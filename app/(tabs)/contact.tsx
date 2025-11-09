@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView, Linking, Platform, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, Linking, Platform, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -33,18 +33,21 @@ const contactActions = [
 
 export default function ContactScreen() {
   const colorScheme = useColorScheme();
+  const { width } = useWindowDimensions();
   const primary = useThemeColor({}, 'primary');
   const cardBg = useThemeColor({}, 'cardBackground');
   const border = useThemeColor({}, 'border');
   const accent = useThemeColor({}, 'accent');
   const secondary = useThemeColor({}, 'secondary');
   const sectionBackground = useThemeColor({}, 'sectionBackground');
+  const isCompact = width < 720;
 
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}
+      contentContainerStyle={styles.scrollContent}
     >
-      <ThemedView style={styles.content}>
+      <ThemedView style={[styles.content, isCompact && styles.contentCompact]}>
         <ThemedView style={[styles.headerSection, { backgroundColor: primary }]}>
           <Ionicons name="chatbubbles" size={42} color="#FFF5F0" />
           <ThemedText type="title" style={[styles.title, { color: '#FFFFFF' }]}
@@ -66,7 +69,10 @@ export default function ContactScreen() {
             <TouchableOpacity
               key={item.label}
               onPress={item.onPress}
-              style={[styles.contactItem, { backgroundColor: sectionBackground, borderColor: accent }]}
+              style={[
+                styles.contactItem,
+                { backgroundColor: sectionBackground, borderColor: accent },
+              ]}
             >
               <ThemedView style={[styles.contactIconBadge, { backgroundColor: primary }]}
               >
@@ -119,10 +125,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
   content: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
     gap: 20,
+    width: '100%',
+    maxWidth: 1080,
+  },
+  contentCompact: {
+    maxWidth: 520,
   },
   headerSection: {
     padding: 28,
@@ -152,6 +168,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
     gap: 16,
+    width: '100%',
   },
   iconContainer: {
     width: 64,
@@ -179,6 +196,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     gap: 12,
+    width: '100%',
   },
   contactIconBadge: {
     width: 36,

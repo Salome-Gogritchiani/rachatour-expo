@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
@@ -36,16 +36,19 @@ const quickActions = [
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
+  const { width } = useWindowDimensions();
   const primary = useThemeColor({}, 'primary');
   const cardBg = useThemeColor({}, 'cardBackground');
   const border = useThemeColor({}, 'border');
   const accent = useThemeColor({}, 'accent');
+  const isCompact = width < 720;
 
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'light'].background }]}
+      contentContainerStyle={styles.scrollContent}
     >
-      <ThemedView style={styles.content}>
+      <ThemedView style={[styles.content, isCompact && styles.contentCompact]}>
         <ThemedView style={[styles.headerCard, { backgroundColor: primary }]}
         >
           <Ionicons name="compass" size={46} color="#FFF5F0" style={styles.headerIcon} />
@@ -55,10 +58,16 @@ export default function HomeScreen() {
           >ეს არის Rachatour აპლიკაციის მთავარი გვერდი</ThemedText>
         </ThemedView>
 
-        <ThemedView style={styles.menuGrid}>
+        <ThemedView style={[styles.menuGrid, isCompact && styles.menuGridCompact]}>
           {quickActions.map((action) => (
             <Link key={action.title} href={action.href} asChild>
-              <TouchableOpacity style={[styles.menuCard, { backgroundColor: cardBg, borderColor: border }]}>
+              <TouchableOpacity
+                style={[
+                  styles.menuCard,
+                  { backgroundColor: cardBg, borderColor: border },
+                  isCompact && styles.menuCardCompact,
+                ]}
+              >
                 <ThemedView style={[styles.menuIconBadge, { backgroundColor: accent }]}>
                   <Ionicons name={action.icon as any} size={26} color={primary} />
                 </ThemedView>
@@ -102,10 +111,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
   content: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
     gap: 20,
+    width: '100%',
+    maxWidth: 1080,
+  },
+  contentCompact: {
+    maxWidth: 520,
   },
   headerCard: {
     padding: 24,
@@ -134,6 +153,10 @@ const styles = StyleSheet.create({
     gap: 16,
     justifyContent: 'space-between',
   },
+  menuGridCompact: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+  },
   menuCard: {
     width: '48%',
     padding: 16,
@@ -145,6 +168,9 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
     gap: 10,
+  },
+  menuCardCompact: {
+    width: '100%',
   },
   menuIconBadge: {
     width: 48,
@@ -181,6 +207,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     gap: 12,
+    width: '100%',
   },
   sectionTitle: {
     marginBottom: 4,
